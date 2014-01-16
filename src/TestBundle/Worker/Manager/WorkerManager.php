@@ -43,6 +43,10 @@ class WorkerManager implements ThreadEventObserverInterface
         $this->logger = $logger;
     }
     
+    public function __destruct() {
+        $this->logger->log('rrrr');
+    }
+    
     /**
      * add a worker 
      * @param \DataSift\TestBundle\Worker\Worker $worker
@@ -79,7 +83,7 @@ class WorkerManager implements ThreadEventObserverInterface
             
             if ($worker->isInTimeOut()) {
                 $this->logger->log($worker . ' is not responding');
-                $this->onChildExit($worker->getThread()->getPid());
+             //  $this->onChildExit($worker->getThread()->getPid());
             }
         }
     }

@@ -9,13 +9,19 @@ use \DataSift\TestBundle\Thread\Event\ThreadEventManager;
 
 require 'autoloader.php';
 
+$nbWorker = 2;
+
 $workerManager = new WorkerManager(new ThreadManager(), new EchoLogger());
 $threadEventManager = new ThreadEventManager(new ThreadManager());
 $workerFactory = new WorkerFactory();
 
 $threadEventManager->addEventObserver($workerManager);
-$workerManager->launchWorker($workerFactory->createWorker(new SumTask()));
-$workerManager->launchWorker($workerFactory->createWorker(new SumTask()));
+
+for ($i=0; $i < $nbWorker; $i++) {
+    $worker = $workerFactory->createWorker();
+    $worker->addTask(new SumTask());
+    $workerManager->launchWorker($worker);
+}
 
 $data = array(
     array(1,2),

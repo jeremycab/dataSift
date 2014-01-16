@@ -2,7 +2,6 @@
 
 namespace DataSift\TestBundle\Worker\Factory;
 
-use \DataSift\TestBundle\Task\TaskInterface;
 use \DataSift\TestBundle\Worker\Worker;
 use \DataSift\TestBundle\Queue\QueueManager;
 use \DataSift\TestBundle\Queue\Queue;
@@ -18,10 +17,13 @@ class WorkerFactory
 {
     /**
      * 
-     * @return \DataSift\TestBundle\Worker
+     * @return Worker
      */
-    public function createWorker(TaskInterface $task)
+    public function createWorker()
     {
-        return new Worker(new Thread(new ThreadManager()), $task, new QueueManager(new Queue()), new QueueManager(new Queue()), 5);
+        return new Worker(
+                new Thread(new ThreadManager()), 
+                new QueueManager(new Queue()), new QueueManager(new Queue()), 
+                5);
     }
 }

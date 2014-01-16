@@ -26,7 +26,7 @@ class ThreadManager
         return (!empty($output));
     }
     
-    public function onChildDied($object, $method)
+    public function onChildExit($object, $method)
     {
         declare(ticks = 1);
         pcntl_signal(SIGCHLD, array(get_class($object),$method)); 

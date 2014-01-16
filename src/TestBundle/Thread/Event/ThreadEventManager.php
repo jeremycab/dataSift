@@ -18,7 +18,7 @@ class ThreadEventManager {
         $this->threadManager = $threadManager;
         $this->observers = array();
         
-        $this->threadManager->onChildDied($this, 'signalHandler');
+        $this->threadManager->onChildExit($this, 'signalHandler');
     }
     
     public function addEventObserver(ThreadEventObserverInterface $observer)

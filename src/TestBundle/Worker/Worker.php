@@ -18,16 +18,16 @@ class Worker
     private $dateLastMsgSent;
     private $timeout;
     private $thread;
-    private $task;
+    private $tasks;
 
-    public function __construct(Thread $thread, TaskInterface $task, QueueManager $queueIn, QueueManager $queueOut, $timeout = 5)
+    public function __construct(Thread $thread, QueueManager $queueIn, QueueManager $queueOut, $timeout = 5)
     {
         $this->queueIn = $queueIn;
         $this->queueOut = $queueOut;
         $this->dateLastMsgSent = time();
         $this->timeout = $timeout;
-        $this->task = $task;
         $this->thread = $thread;
+        $this->tasks = array();
     }
     
     public function sendMsg($msg)
@@ -36,8 +36,12 @@ class Worker
         $this->dateLastMsgSent = time();
     }
     
+    public function addTask(TaskInterface $task)
+    {
+        $this->tasks[] = $task;
+    }
+    
     /**
-     * 
      * @return Thread
      */
     public function getThread()
@@ -66,9 +70,10 @@ class Worker
     {
         $queue = $this->queueIn->getCurrentMsg();
         foreach ($queue as $msg) {
-          //  $this->thread->log('Msg received by ' . $this->thread);
-            $result = $this->task->work(array($msg));
-            $this->queueOut->sendMsg('Message traité par ' . $this->thread . '. Result : ' . $result);
+            foreach ($this->tasks as $task) {
+                $result = $task->work(array($msg));
+                $this->queueOut->sendMsg('Message traité par ' . $this->thread . '. Result : ' . $result);
+            }
         }
     }
     
@@ -97,5 +102,10 @@ class Worker
     public function isRunning()
     {
         return true;
+    }
+    
+    public function setIsInChildProcess()
+    {
+        
     }
 }
