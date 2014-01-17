@@ -7,6 +7,7 @@ use \DataSift\TestBundle\Queue\QueueManager;
 use \DataSift\TestBundle\Queue\Queue;
 use \DataSift\TestBundle\Thread\Thread;
 use \DataSift\TestBundle\Thread\Manager\ThreadManager;
+use \DataSift\TestBundle\Worker\Type\WorkerFactoryType;
 
 /**
  * Description of WorkerFactory
@@ -19,11 +20,14 @@ class WorkerFactory
      * 
      * @return Worker
      */
-    public function createWorker()
+    public function createWorker(\DataSift\TestBundle\Log\Logger\LoggerInterface $logger, $timeout)
     {
         return new Worker(
                 new Thread(new ThreadManager()), 
-                new QueueManager(new Queue()), new QueueManager(new Queue()), 
-                5);
+                new QueueManager(new Queue()), 
+                new QueueManager(new Queue()), 
+                new WorkerFactoryType(),
+                $logger,
+                $timeout);
     }
 }

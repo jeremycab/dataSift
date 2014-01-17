@@ -46,6 +46,19 @@ class QueueManager
     
     public function countNbMessagesInQueue()
     {
-        return $this->queue->countMsgInQueue();
+        $stats = $this->queue->getStats();
+        return $stats['msg_qnum'];
+    }
+    
+    public function getLastMsgSent()
+    {
+        $stats = $this->queue->getStats();
+        return $stats['msg_stime'];
+    }
+    
+    public function getLastMsgReceived()
+    {
+        $stats = $this->queue->getStats();
+        return $stats['msg_rtime'];
     }
 }

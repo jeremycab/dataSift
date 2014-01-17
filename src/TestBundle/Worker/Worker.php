@@ -5,6 +5,8 @@ namespace DataSift\TestBundle\Worker;
 use DataSift\TestBundle\Queue\QueueManager;
 use \DataSift\TestBundle\Task\TaskInterface;
 use \DataSift\TestBundle\Thread\Thread;
+use DataSift\TestBundle\Worker\Type\WorkerFactoryType;
+use \DataSift\TestBundle\Log\Logger\LoggerInterface;
 
 /**
  * Description of Worker
@@ -13,23 +15,84 @@ use \DataSift\TestBundle\Thread\Thread;
  */
 class Worker
 {
+    /**
+     * @var QueueManager 
+     */
     private $queueIn;
+    
+    /**
+     * @var QueueManager 
+     */
     private $queueOut;
-    private $dateLastMsgSent;
+    
+    /**
+     * @var int
+     */
     private $timeout;
+    
+    /**
+     * @var Thread
+     */
     private $thread;
+    
+    /**
+     * @var array
+     */
     private $tasks;
+    
+    /**
+     * @var WorkerFactoryType 
+     */
+    private $typeFactory;
+    
+    /**
+     * @var Type\WorkerAbstractType 
+     */
+    private $type;
+    
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(Thread $thread, QueueManager $queueIn, QueueManager $queueOut, $timeout = 5)
+    public function __construct(
+            Thread $thread, 
+            QueueManager $queueIn, 
+            QueueManager $queueOut, 
+            WorkerFactoryType $typeFactory, 
+            LoggerInterface $logger,
+            $timeout = 5)
     {
         $this->queueIn = $queueIn;
         $this->queueOut = $queueOut;
-        $this->dateLastMsgSent = time();
         $this->timeout = $timeout;
         $this->thread = $thread;
         $this->tasks = array();
+        $this->typeFactory = $typeFactory;
+        $this->logger = $logger;
+        $this->type = $this->typeFactory->getTypeParent($this);
     }
     
+    public function getQueueIn()
+    {
+        return $this->queueIn;
+    }
+
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+    
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
     public function sendMsg($msg)
     {
         $this->queueIn->sendMsg($msg);
@@ -48,14 +111,6 @@ class Worker
     {
         return $this->thread;
     }
-
-    /**
-     * @return \SplQueue
-     */
-    public function getMessagesFrom()
-    {
-        return $this->queueOut->getCurrentMsg();
-    }
     
     /**
      * 
@@ -68,13 +123,7 @@ class Worker
 
     public function processQueue()
     {
-        $queue = $this->queueIn->getCurrentMsg();
-        foreach ($queue as $msg) {
-            foreach ($this->tasks as $task) {
-                $result = $task->work(array($msg));
-                $this->queueOut->sendMsg('Message traité par ' . $this->thread . '. Result : ' . $result);
-            }
-        }
+        $this->type->processQueueMessages();
     }
     
     public function isAvailable()
@@ -86,17 +135,20 @@ class Worker
     public function sendMsgStillAlive()
     {
         $this->queueOut->sendMsg('Worker on ' . $this->thread . " is still alive");
-        $this->dateLastMsgSent = time();
     }
     
     public function isInTimeOut()
     {
-        $time = time();
-        return (($time - $this->dateLastMsgSent) > $this->timeout);
+        return $this->type->isInTimeOut();
     }
     
     public function __toString() {
         return 'Worker on ' . $this->thread;
+    }
+    
+    public function run()
+    {
+        $this->type->run();
     }
     
     public function isRunning()
@@ -106,6 +158,6 @@ class Worker
     
     public function setIsInChildProcess()
     {
-        
+        $this->type = $this->typeFactory->getTypeChild($this);
     }
 }

@@ -28,9 +28,9 @@ class Queue
     public function getMsgQueue()
     {
         $messages = array();
+        $stats = $this->getStats();
 
-        $nb = $this->countMsgInQueue();
-        for ($i =0; $i < $nb; $i++) {
+        for ($i =0; $i < $stats['msg_qnum']; $i++) {
             msg_receive($this->queueRessource, 0, $msgType, self::MAX_SIZE, $message);
            $messages[] = $message;
         }
@@ -43,10 +43,9 @@ class Queue
         msg_send($this->queueRessource, 1, $msg);
     }
     
-    public function countMsgInQueue()
+    public function getStats()
     {
-        $stats = msg_stat_queue($this->queueRessource);
-        return $stats['msg_qnum'];
+        return msg_stat_queue($this->queueRessource);
     }
     
     private function loadQueueRessource()
