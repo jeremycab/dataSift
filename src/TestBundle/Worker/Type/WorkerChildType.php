@@ -27,6 +27,7 @@ class WorkerChildType extends WorkerAbstractType
             }
 
             foreach ($this->worker->getTasks() as $task) {
+                 $this->worker->getQueueOut()->sendMsg($this->worker . ' start new task');
                 $result = $task->work(array($msg));
                 $this->worker->getQueueOut()->sendMsg('Message processed by ' . $this->worker . '. Result : ' . $result);
             }

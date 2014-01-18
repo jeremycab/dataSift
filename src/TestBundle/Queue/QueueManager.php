@@ -67,5 +67,4 @@ class QueueManager
     {
         $this->queue->loadNewQueueId();
     }
-
 }

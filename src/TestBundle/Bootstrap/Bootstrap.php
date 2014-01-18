@@ -41,10 +41,11 @@ class Bootstrap
                 $this->config['nb_clients_max'], 
                 $this->logger);
 
-        $workerManager = new WorkerManager(new ThreadManager(), $this->logger);
+        $workerFactory = new WorkerFactory();
+        $workerManager = new WorkerManager(new ThreadManager(), $workerFactory, $this->logger);
         $threadEventManager = new ThreadEventManager(new ThreadManager());
         $GLOBALS['threadEventManager'] = $threadEventManager;
-        $workerFactory = new WorkerFactory();
+        
 
         $threadEventManager->addEventObserver($workerManager);
         $server->addListener($workerManager);

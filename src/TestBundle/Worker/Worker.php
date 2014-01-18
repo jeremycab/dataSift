@@ -169,6 +169,11 @@ class Worker
         $this->isActive = false;
     }
     
+    public function setIsActive()
+    {
+        $this->isActive = true;
+    }
+    
     public function isActive()
     {
         return $this->isActive;
@@ -179,9 +184,8 @@ class Worker
         exit(0);
     }
     
-    public function reloadQueues()
+    public function setTask(array $tasks)
     {
-        $this->queueIn->loadNewQueueId();
-        $this->queueOut->loadNewQueueId();
+        $this->tasks = $tasks;
     }
 }

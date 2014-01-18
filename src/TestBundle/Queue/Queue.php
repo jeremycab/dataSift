@@ -53,7 +53,6 @@ class Queue
         while (msg_queue_exists($id)) {
             $id = rand(1, 10000000);
         }
-        
         $this->id = $id;
         $this->loadQueueRessource();
     }

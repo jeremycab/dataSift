@@ -21,6 +21,7 @@ class WorkerParentType extends WorkerAbstractType
     {
         $messages = $this->worker->getQueueOut()->getCurrentMsg();
         if (!$this->worker->isActive() && $messages->count() > 0) {
+            $this->logger->log($this->worker . ' has to quit : ');
             $this->worker->getQueueIn()->sendMsg(Worker::MSG_QUIT);
         }
         

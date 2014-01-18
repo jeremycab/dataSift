@@ -7,6 +7,7 @@ use \DataSift\TestBundle\Log\Logger\LoggerInterface;
 use \DataSift\TestBundle\Worker\Worker;
 use \DataSift\TestBundle\Thread\Event\Observer\ThreadEventObserverInterface;
 use \DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
+use \DataSift\TestBundle\Worker\Factory\WorkerFactory;
 
 /**
  * Description of WorkerManager
@@ -15,6 +16,7 @@ use \DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
  */
 class WorkerManager implements ThreadEventObserverInterface, ServerListenerInterface
 {
+
     /**
      * @var \DataSift\TestBundle\Thread\Manager\ThreadManager
      */
@@ -34,13 +36,15 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
      * \DataSift\TestBundle\Log\Logger\LoggerInterface
      */
     private $logger;
+    private $workerFactory;
 
-    public function __construct(ThreadManager $threadManager, LoggerInterface $logger)
+    public function __construct(ThreadManager $threadManager, WorkerFactory $workerFactory, LoggerInterface $logger)
     {
         $this->threadManager = $threadManager;
         $this->workers = array();
         $this->data = array();
         $this->logger = $logger;
+        $this->workerFactory = $workerFactory;
     }
 
     /**
@@ -54,6 +58,7 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
 
         if ($pid != 0) {
             $worker->getThread()->setPid($pid);
+            $worker->setIsActive();
             $this->workers[$pid] = $worker;
         } else {
             $worker->setIsInChildProcess();
@@ -84,7 +89,8 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
         foreach ($this->data as $key => $data) {
             /* @var $worker Worker */
             foreach ($this->workers as $worker) {
-                if ($worker->isActive()) {
+                if ($worker->isAvailable()) {
+                    $this->logger->log("send task to " . $worker);
                     $worker->sendMsg($data);
                     unset($this->data[$key]);
                     break;
@@ -98,13 +104,16 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
         if (isset($this->workers[$pid])) {
             /* @var $worker Worker */
             $worker = $this->workers[$pid];
-            $this->logger->log($worker . ' is dead or not responding');
-            
-            $newWorker = clone $worker;
-            $worker->setIsInactive();
-            $newWorker->reloadQueues();
-            $this->launchWorker($newWorker);
+
+            if ($worker->isActive()) {
+                $worker->setIsInactive();
+                $this->logger->log($worker . ' is dead or not responding');
+
+                $newWorker = $this->workerFactory->createWorker($worker->getLogger(), $worker->getTimeout());
+                $newWorker->setTask($worker->getTasks());
+                $this->launchWorker($newWorker);
+                sleep(1);
+            }
         }
     }
-            
 }
