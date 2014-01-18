@@ -1,6 +1,6 @@
 <?php
 
-namespace DataSift\TestBundle\Server\Listener;
+namespace DataSift\TestBundle\Socket\Server\Listener;
 
 /**
  *

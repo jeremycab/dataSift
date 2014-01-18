@@ -15,6 +15,7 @@ use \DataSift\TestBundle\Log\Logger\LoggerInterface;
  */
 class Worker
 {
+    const MSG_QUIT = 'youhavetoquitnow!!!!!';
     /**
      * @var QueueManager 
      */
@@ -51,6 +52,11 @@ class Worker
     private $type;
     
     /**
+     * @var boolean
+     */
+    private $isActive;
+    
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -70,6 +76,7 @@ class Worker
         $this->tasks = array();
         $this->typeFactory = $typeFactory;
         $this->logger = $logger;
+        $this->isActive = true;
         $this->type = $this->typeFactory->getTypeParent($this);
     }
     
@@ -129,7 +136,8 @@ class Worker
     public function isAvailable()
     {
         return ($this->queueIn->countNbMessagesInQueue() == 0
-                && !$this->isInTimeOut());
+                && !$this->isInTimeOut()
+                && $this->isActive);
     }
     
     public function sendMsgStillAlive()
@@ -151,13 +159,29 @@ class Worker
         $this->type->run();
     }
     
-    public function isRunning()
-    {
-        return true;
-    }
-    
     public function setIsInChildProcess()
     {
         $this->type = $this->typeFactory->getTypeChild($this);
+    }
+    
+    public function setIsInactive()
+    {
+        $this->isActive = false;
+    }
+    
+    public function isActive()
+    {
+        return $this->isActive;
+    }
+    
+    public function stop()
+    {
+        exit(0);
+    }
+    
+    public function reloadQueues()
+    {
+        $this->queueIn->loadNewQueueId();
+        $this->queueOut->loadNewQueueId();
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace DataSift\TestBundle\Server;
+namespace DataSift\TestBundle\Socket\Server;
 
 use \DataSift\TestBundle\Log\Logger\LoggerInterface;
-use DataSift\TestBundle\Server\Listener\ServerListenerInterface;
+use DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
 
 /**
  * Description of SocketServer
@@ -45,6 +45,9 @@ class SocketServer extends SocketServerAbstract
         foreach ($this->listeners as $listener) {
             $listener->onDataReceived($data);
         }
+        
+        socket_write($socket, 'Data sent to workers');
+     //   socket_close($socket);
     }  
     
     public function log($message, $socketError = false)

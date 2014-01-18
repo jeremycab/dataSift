@@ -6,7 +6,7 @@ use \DataSift\TestBundle\Thread\Manager\ThreadManager;
 use \DataSift\TestBundle\Log\Logger\LoggerInterface;
 use \DataSift\TestBundle\Worker\Worker;
 use \DataSift\TestBundle\Thread\Event\Observer\ThreadEventObserverInterface;
-use \DataSift\TestBundle\Server\Listener\ServerListenerInterface;
+use \DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
 
 /**
  * Description of WorkerManager
@@ -57,7 +57,9 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
             $this->workers[$pid] = $worker;
         } else {
             $worker->setIsInChildProcess();
+            $worker->getThread()->loadCurrentPid();
             $worker->run();
+            $worker->stop();
         }
     }
 
@@ -66,7 +68,7 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
         /* @var $worker Worker */
         foreach ($this->workers as $worker) {
             $worker->processQueue();
-            if ($worker->isInTimeOut()) {
+            if ($worker->isActive() && $worker->isInTimeOut()) {
                 $this->onChildExit($worker->getThread()->getPid());
             }
         }
@@ -82,7 +84,7 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
         foreach ($this->data as $key => $data) {
             /* @var $worker Worker */
             foreach ($this->workers as $worker) {
-                if ($worker->isAvailable()) {
+                if ($worker->isActive()) {
                     $worker->sendMsg($data);
                     unset($this->data[$key]);
                     break;
@@ -96,10 +98,12 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
         if (isset($this->workers[$pid])) {
             /* @var $worker Worker */
             $worker = $this->workers[$pid];
-            unset($this->workers[$pid]);
-
             $this->logger->log($worker . ' is dead or not responding');
-            $this->launchWorker($worker);
+            
+            $newWorker = clone $worker;
+            $worker->setIsInactive();
+            $newWorker->reloadQueues();
+            $this->launchWorker($newWorker);
         }
     }
             

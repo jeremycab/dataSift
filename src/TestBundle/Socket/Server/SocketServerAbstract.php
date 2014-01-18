@@ -1,6 +1,6 @@
 <?php
 
-namespace DataSift\TestBundle\Server;
+namespace DataSift\TestBundle\Socket\Server;
 
 /**
  * Class to handle a sockets server
@@ -62,7 +62,7 @@ abstract class SocketServerAbstract
     public function start()
     {
         // create master socket
-        $this->master = @socket_create(AF_INET, SOCK_STREAM, 0) or die($this->log('Could not create socket'));
+        $this->master = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP) or die($this->log('Could not create socket'));
 
         // to prevent: address already in use
         socket_set_option($this->master, SOL_SOCKET, SO_REUSEADDR, 1) or die($this->log('Could not set up SO_REUSEADDR'));
@@ -120,7 +120,7 @@ abstract class SocketServerAbstract
             }
 
             if (sizeof($read) == 1)
-                continue;
+                return;
         }
 
         // foreach client that is ready to be read

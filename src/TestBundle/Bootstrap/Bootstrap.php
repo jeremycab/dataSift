@@ -8,7 +8,7 @@ use \DataSift\TestBundle\Worker\Factory\WorkerFactory;
 use \DataSift\TestBundle\Task\TaskInterface;
 use \DataSift\TestBundle\Thread\Manager\ThreadManager;
 use \DataSift\TestBundle\Thread\Event\ThreadEventManager;
-use DataSift\TestBundle\Server\SocketServer;
+use DataSift\TestBundle\Socket\Server\SocketServer;
 
 /**
  * Description of Bootstrap
@@ -35,10 +35,15 @@ class Bootstrap
 
     public function run()
     {
-        $server = new SocketServer('localhost', null, 10, $this->logger);
+        $server = new SocketServer(
+                $this->config['server_adress'], 
+                $this->config['server_port'], 
+                $this->config['nb_clients_max'], 
+                $this->logger);
 
         $workerManager = new WorkerManager(new ThreadManager(), $this->logger);
         $threadEventManager = new ThreadEventManager(new ThreadManager());
+        $GLOBALS['threadEventManager'] = $threadEventManager;
         $workerFactory = new WorkerFactory();
 
         $threadEventManager->addEventObserver($workerManager);
@@ -52,7 +57,7 @@ class Bootstrap
             $workerManager->launchWorker($worker);
         }
         
-        sleep(3);
+        sleep(1);
         
         $server->start();
         while (true) {

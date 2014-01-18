@@ -2,6 +2,8 @@
 
 namespace DataSift\TestBundle\Worker\Type;
 
+use \DataSift\TestBundle\Worker\Worker;
+
 /**
  * Description of WorkerTypeChild
  *
@@ -19,9 +21,14 @@ class WorkerChildType extends WorkerAbstractType
     {
         $queue = $this->worker->getQueueIn()->getCurrentMsg();
         foreach ($queue as $msg) {
+            if ($msg == Worker::MSG_QUIT) {
+                $this->worker->setIsInactive();
+                return;
+            }
+
             foreach ($this->worker->getTasks() as $task) {
                 $result = $task->work(array($msg));
-                $this->worker->getQueueOut()->sendMsg('Message processed by ' . $this->thread . '. Result : ' . $result);
+                $this->worker->getQueueOut()->sendMsg('Message processed by ' . $this->worker . '. Result : ' . $result);
             }
         }
     }
@@ -30,7 +37,7 @@ class WorkerChildType extends WorkerAbstractType
     {
         $this->worker->sendMsgStillAlive();
 
-        while ($this->worker->isRunning()) {
+        while ($this->worker->isActive()) {
             $this->worker->processQueue();
             if ($this->worker->isInTimeOut()) {
                 $this->worker->sendMsgStillAlive();
@@ -38,3 +45,4 @@ class WorkerChildType extends WorkerAbstractType
         }
     }
 }
+

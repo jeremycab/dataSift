@@ -1,7 +1,8 @@
 {
     "require-dev": {
         "phpunit/phpunit": "3.7.*",
-		"zendframework/zend-config": "2.0.*"
+		"zendframework/zend-config": "2.0.*",
+		"zendframework/zend-console": "2.0.*"
     },
 	
 	"repositories": [

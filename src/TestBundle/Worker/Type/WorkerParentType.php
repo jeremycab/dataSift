@@ -2,6 +2,8 @@
 
 namespace DataSift\TestBundle\Worker\Type;
 
+use \DataSift\TestBundle\Worker\Worker;
+
 /**
  * Description of WorkerTypeParent
  *
@@ -18,6 +20,10 @@ class WorkerParentType extends WorkerAbstractType
     public function processQueueMessages()
     {
         $messages = $this->worker->getQueueOut()->getCurrentMsg();
+        if (!$this->worker->isActive() && $messages->count() > 0) {
+            $this->worker->getQueueIn()->sendMsg(Worker::MSG_QUIT);
+        }
+        
         foreach ($messages as $message) {
              $this->logger->log($message);
         }

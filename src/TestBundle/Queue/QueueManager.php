@@ -9,13 +9,14 @@ namespace DataSift\TestBundle\Queue;
  */
 class QueueManager
 {
+
     private $queue;
-    
+
     public function __construct(Queue $queue)
     {
         $this->queue = $queue;
     }
-    
+
     /**
      * 
      * @return \SplQueue
@@ -30,35 +31,41 @@ class QueueManager
                 $queueSpl->enqueue($msg);
             }
         }
-        
+
         return $queueSpl;
     }
-    
+
     public function sendMsg($msg)
     {
         $this->queue->sendMsg($msg);
     }
-    
+
     public function clear()
     {
         $this->queue->removeQueue();
     }
-    
+
     public function countNbMessagesInQueue()
     {
         $stats = $this->queue->getStats();
         return $stats['msg_qnum'];
     }
-    
+
     public function getLastMsgSent()
     {
         $stats = $this->queue->getStats();
         return $stats['msg_stime'];
     }
-    
+
     public function getLastMsgReceived()
     {
         $stats = $this->queue->getStats();
         return $stats['msg_rtime'];
     }
+
+    public function loadNewQueueId()
+    {
+        $this->queue->loadNewQueueId();
+    }
+
 }

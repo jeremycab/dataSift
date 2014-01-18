@@ -16,13 +16,7 @@ class Queue
     
     public function __construct()
     {
-        $id = rand(1, 10000000);
-        while (msg_queue_exists($id)) {
-            $id = rand(1, 10000000);
-        }
-        
-        $this->id = $id;
-        $this->loadQueueRessource();
+        $this->loadNewQueueId();
     }
     
     public function getMsgQueue()
@@ -51,5 +45,16 @@ class Queue
     private function loadQueueRessource()
     {
         $this->queueRessource = msg_get_queue($this->id);
+    }
+    
+    public function loadNewQueueId()
+    {
+        $id = rand(1, 10000000);
+        while (msg_queue_exists($id)) {
+            $id = rand(1, 10000000);
+        }
+        
+        $this->id = $id;
+        $this->loadQueueRessource();
     }
 }
