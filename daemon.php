@@ -8,6 +8,8 @@ use \Zend\Config\Reader\Ini;
 require 'autoloader.php';
 require 'vendor/autoload.php';
 
+date_default_timezone_set('Europe/London');
+
 $configIni = new Ini();
 $config = $configIni->fromFile('app/config/config.ini');
 

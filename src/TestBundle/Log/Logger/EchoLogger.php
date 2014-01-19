@@ -10,6 +10,6 @@ class EchoLogger implements LoggerInterface
 {
     public function log($msg)
     {
-        echo "$msg \n";
+        echo '[' . date('Y-m-d H:i:s') . '] : ' . "$msg \n";
     }    
 }

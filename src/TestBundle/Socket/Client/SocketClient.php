@@ -9,10 +9,18 @@ namespace DataSift\TestBundle\Socket\Client;
  */
 class SocketClient
 {
+    private $adress;
+    private $port;
+    
+    public function __construct($adress, $port)
+    {
+        $this->adress = $adress;
+        $this->port = $port;
+    }
 
     public function sendData($data)
     {
-        $fp = stream_socket_client("tcp://127.0.0.1:8080", $errno, $errstr, 30);
+        $fp = stream_socket_client("tcp://" . $this->adress . ":" . $this->port, $errno, $errstr, 30);
         if (!$fp) {
             echo "$errstr ($errno)<br />\n";
         } else {
