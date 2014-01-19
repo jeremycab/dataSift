@@ -5,8 +5,7 @@ namespace DataSift\TestBundle\Thread;
 use \DataSift\TestBundle\Thread\Manager\ThreadManager;
 
 /**
- * Description of Thread
- *
+ * represent a linux thread
  * @author jcabantous
  */
 class Thread
@@ -21,9 +20,14 @@ class Thread
      */
     private $threadManager;
     
+    /**
+     * init the thread with a manager
+     * @param \DataSift\TestBundle\Thread\Manager\ThreadManager $threadManager
+     */
     public function __construct(ThreadManager $threadManager)
     {
         $this->threadManager = $threadManager;
+        //load the current PID
         $this->pid = $this->threadManager->getPid();
     }
 
@@ -36,21 +40,27 @@ class Thread
         return $this->pid;
     }
     
+    /**
+     * set an id to the thread
+     * @param type $pid
+     */
     public function setPid($pid)
     {
         $this->pid = $pid;
     }
     
+    /**
+     * magic method 
+     * @return string
+     */
     public function __toString()
     {
         return 'Thread (PID=' . $this->pid . ')';
     }
-    
-    public function isAlive()
-    {
-        return $this->threadManager->isProcessRunning($this->pid);
-    }
-    
+
+    /**
+     * assign to the thread the current PID
+     */
     public function loadCurrentPid()
     {
         $this->pid = $this->threadManager->getPid();
