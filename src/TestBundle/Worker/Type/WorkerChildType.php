@@ -31,13 +31,14 @@ class WorkerChildType extends WorkerAbstractType
         foreach ($queue as $msg) {
             if ($msg == Worker::MSG_QUIT) {
                 $this->worker->setIsInactive();
+                $this->logger->log($this->worker . ' say : Worker manager ordered me to quit. Bye bye.');
                 return;
             }
 
             $tasks = $this->worker->getTasks();
             //call each task with the data received
             foreach ($tasks as $task) {
-                $this->worker->sendMsgFrom($this->worker . ' start new task');
+                $this->logger->log($this->worker . ' start new task');
                 $result = $task->work($msg);
                 $this->worker->sendMsgFrom('Message processed by ' . $this->worker . '. Result : ' . $result);
             }

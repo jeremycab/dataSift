@@ -5,8 +5,6 @@ namespace DataSift\TestBundle\Worker\Collection;
 use \DataSift\TestBundle\Worker\Worker;
 
 /**
- * Description of Collection
- *
  * @author jcabantous
  */
 class WorkerCollection

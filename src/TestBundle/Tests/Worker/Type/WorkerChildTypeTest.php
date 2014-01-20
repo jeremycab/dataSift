@@ -97,7 +97,7 @@ class WorkerChildTypeTest extends \PHPUnit_Framework_TestCase
                 ->method('getTasks')
                 ->will($this->returnValue($tasks));
         
-        $this->worker->expects($this->exactly($queue->count() * 2))
+        $this->worker->expects($this->exactly($queue->count()))
                 ->method('sendMsgFrom')
                 ->will($this->returnValue($tasks));
         

@@ -145,7 +145,6 @@ class Worker
         $this->queueOut->sendMsg($msg);
     }
     
-    
     /**
      * add a task to perform
      * @param \DataSift\TestBundle\Task\TaskInterface $task
@@ -290,7 +289,7 @@ class Worker
      */
     public function getMsgsSent()
     {
-        return $this->worker->getQueueOut()->getCurrentMsg();
+        return $this->getQueueOut()->getCurrentMsg();
     }
     
     /**
@@ -299,6 +298,6 @@ class Worker
      */
     public function getMsgsReceived()
     {
-        return $this->worker->getQueueIn()->getCurrentMsg();
+        return $this->getQueueIn()->getCurrentMsg();
     }
 }

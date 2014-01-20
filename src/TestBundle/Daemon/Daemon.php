@@ -9,7 +9,7 @@ use \DataSift\TestBundle\Task\TaskInterface;
 use \DataSift\TestBundle\Thread\Manager\ThreadManager;
 use \DataSift\TestBundle\Thread\Event\ThreadEventManager;
 use DataSift\TestBundle\Socket\Server\SocketServer;
-use \DataSift\TestBundle\Worker\Collection\WorkersCollection;
+use \DataSift\TestBundle\Worker\Collection\WorkerCollection;
 
 /**
  * manage the pro
@@ -66,7 +66,7 @@ class Daemon
                 $this->logger);
 
         $workerFactory = new WorkerFactory();
-        $workerManager = new WorkerManager(new ThreadManager(), $workerFactory, $this->logger, new \DataSift\TestBundle\Worker\Collection\WorkersCollection());
+        $workerManager = new WorkerManager(new ThreadManager(), $workerFactory, $this->logger, new WorkerCollection());
         $threadEventManager = new ThreadEventManager(new ThreadManager());
         //put the thread manager in globals to use it in the pcntl signal header
         $GLOBALS['threadEventManager'] = $threadEventManager;
