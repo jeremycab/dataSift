@@ -131,11 +131,20 @@ class Worker
      * send a message to the worker
      * @param type $msg
      */
-    public function sendMsg($msg)
+    public function sendMsgTo($msg)
     {
         $this->queueIn->sendMsg($msg);
-        $this->dateLastMsgSent = time();
     }
+
+    /**
+     * send message from the worker
+     * @param type $msg
+     */
+    public function sendMsgFrom($msg)
+    {
+        $this->queueOut->sendMsg($msg);
+    }
+    
     
     /**
      * add a task to perform
@@ -255,5 +264,41 @@ class Worker
     public function stop()
     {
         exit(0);
+    }
+    
+    /**
+     * get the timestamp of the last message received by the worker
+     * @return int
+     */
+    public function getTimestampLastMsgReceived()
+    {
+        return $this->getQueueOut()->getLastMsgReceived();
+    }
+    
+    /**
+     * get the timestamp of the last message sent by the worker
+     * @return int
+     */
+    public function getTimestampLastMsgSent()
+    {
+        return $this->getQueueOut()->getLastMsgSent();
+    }
+    
+    /**
+     * get all the  messages sent by the worker and still in the queue out
+     * @return \SplQueue
+     */
+    public function getMsgsSent()
+    {
+        return $this->worker->getQueueOut()->getCurrentMsg();
+    }
+    
+    /**
+     * get all the  messages received by the worker and pending to be processed
+     * @return \SplQueue
+     */
+    public function getMsgsReceived()
+    {
+        return $this->worker->getQueueIn()->getCurrentMsg();
     }
 }

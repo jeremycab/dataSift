@@ -10,6 +10,8 @@ use \DataSift\TestBundle\Worker\Worker;
  */
 class WorkerParentType extends WorkerAbstractType
 {
+    const DELAY_TIMEOUT = 3;
+    
     /**
      * override WorkerAbstractType
      * @return boolean
@@ -17,7 +19,7 @@ class WorkerParentType extends WorkerAbstractType
     public function isInTimeOut()
     {
         //wait a little bit more to avoid delay issues
-        return ((time() - $this->worker->getQueueOut()->getLastMsgReceived() ) > ($this->worker->getTimeout()) + 3);
+        return ((time() - $this->worker->getTimestampLastMsgReceived() ) > ($this->worker->getTimeout()) + self::DELAY_TIMEOUT);
     }
 
     /**
@@ -26,11 +28,11 @@ class WorkerParentType extends WorkerAbstractType
     public function processQueueMessages()
     {
         //get all the messages sent byt the worker
-        $messages = $this->worker->getQueueOut()->getCurrentMsg();
+        $messages = $this->worker->getMsgsSent();
         //if an inactive worker has sent a message => we ask it to quit
         if (!$this->worker->isActive() && $messages->count() > 0) {
             $this->logger->log($this->worker . ' has to quit : ');
-            $this->worker->getQueueIn()->sendMsg(Worker::MSG_QUIT);
+            $this->worker->sendMsgTo(Worker::MSG_QUIT);
         }
         
         foreach ($messages as $message) {

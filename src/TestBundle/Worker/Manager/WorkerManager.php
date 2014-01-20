@@ -8,6 +8,7 @@ use \DataSift\TestBundle\Worker\Worker;
 use \DataSift\TestBundle\Thread\Event\Observer\ThreadEventObserverInterface;
 use \DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
 use \DataSift\TestBundle\Worker\Factory\WorkerFactory;
+use DataSift\TestBundle\Worker\Collection\WorkerCollection;
 
 /**
  * manage a pool of workers
@@ -15,7 +16,6 @@ use \DataSift\TestBundle\Worker\Factory\WorkerFactory;
  */
 class WorkerManager implements ThreadEventObserverInterface, ServerListenerInterface
 {
-
     /**
      * @var \DataSift\TestBundle\Thread\Manager\ThreadManager
      */
@@ -23,9 +23,9 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
 
     /**
      * the list of workers to manage
-     * @var array
+     * @var WorkersCollection
      */
-    private $workers;
+    private $workersCollection;
 
     /**
      * list of data to process
@@ -37,7 +37,7 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
      * \DataSift\TestBundle\Log\Logger\LoggerInterface
      */
     private $logger;
-    
+
     /**
      * @var WorkerFactory
      */
@@ -49,10 +49,15 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
      * @param \DataSift\TestBundle\Worker\Factory\WorkerFactory $workerFactory
      * @param \DataSift\TestBundle\Log\Logger\LoggerInterface $logger
      */
-    public function __construct(ThreadManager $threadManager, WorkerFactory $workerFactory, LoggerInterface $logger)
+    public function __construct(
+            ThreadManager $threadManager, 
+            WorkerFactory $workerFactory, 
+            LoggerInterface $logger, 
+            WorkerCollection $workerCollection
+            )
     {
         $this->threadManager = $threadManager;
-        $this->workers = array();
+        $this->workersCollection = $workerCollection;
         $this->data = array();
         $this->logger = $logger;
         $this->workerFactory = $workerFactory;
@@ -74,7 +79,7 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
             //put the worker in active status
             $worker->setIsActive();
             //add it to the collections
-            $this->workers[$pid] = $worker;
+            $this->workersCollection->addWorker($worker);
         } else { // if we are in the child process
             //set the child strategy to the process
             $worker->setIsInChildProcess();
@@ -92,8 +97,9 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
      */
     public function checkWorkersStatus()
     {
+        $workers = $this->workersCollection->getAll();
         /* @var $worker Worker */
-        foreach ($this->workers as $worker) {
+        foreach ($workers as $worker) {
             //process the messages of the workers
             $worker->processQueue();
             //if the worker is set to active but is in timeout
@@ -120,12 +126,12 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
     {
         foreach ($this->data as $key => $data) {
             /* @var $worker Worker */
-            foreach ($this->workers as $worker) {
+            foreach ($this->workersCollection->getAll() as $worker) {
                 //check if the worker is available to process data
                 if ($worker->isAvailable()) {
                     $this->logger->log("send task to " . $worker);
                     //send the message
-                    $worker->sendMsg($data);
+                    $worker->sendMsgTo($data);
                     unset($this->data[$key]);
                     break;
                 }
@@ -140,27 +146,26 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
      */
     public function onChildExit($pid)
     {
-        //chekc if the process is in the pool of data
-        if (isset($this->workers[$pid])) {
-            /* @var $worker Worker */
-            $worker = $this->workers[$pid];
+        $worker = $this->workersCollection->getWorkerFromPid($pid);
+        if (is_null($worker)) {
+            return;
+        }
 
-            //if the worker is set as active
-            if ($worker->isActive()) {
-                //put it as inactive
-                $worker->setIsInactive();
-                $this->logger->log($worker . ' is dead or not responding');
-                //pop the messages of the inactive worker and set them into the collections of data to process
-                foreach ($worker->getQueueIn()->getCurrentMsg() as $message) {
-                    $this->data[] = $message;
-                }
-                
-                //create and launch a new one
-                $newWorker = $this->workerFactory->copyWorker($worker);
-                $this->launchWorker($newWorker);
-                //wait to be sure the worker is correctly set up
-                sleep(1);
+        //if the worker is set as active
+        if ($worker->isActive()) {
+            //put it as inactive
+            $worker->setIsInactive();
+            $this->logger->log($worker . ' is dead or not responding');
+            //pop the messages of the inactive worker and set them into the collections of data to process
+            foreach ($worker->getMsgsReceived() as $message) {
+                $this->data[] = $message;
             }
+
+            //create and launch a new one
+            $newWorker = $this->workerFactory->copyWorker($worker);
+            $this->launchWorker($newWorker);
+            //wait to be sure the worker is correctly set up
+            sleep(1);
         }
     }
 }

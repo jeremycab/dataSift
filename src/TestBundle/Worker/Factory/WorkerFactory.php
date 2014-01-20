@@ -8,6 +8,7 @@ use \DataSift\TestBundle\Queue\Queue;
 use \DataSift\TestBundle\Thread\Thread;
 use \DataSift\TestBundle\Thread\Manager\ThreadManager;
 use \DataSift\TestBundle\Worker\Type\WorkerFactoryType;
+use \DataSift\TestBundle\Log\Logger\LoggerInterface;
 
 /**
  * manage the instanciation of the workers
@@ -21,7 +22,7 @@ class WorkerFactory
      * @param type $timeout : the timeout delay to send a keep-alive message
      * @return \DataSift\TestBundle\Worker\Worker
      */
-    public function createWorker(\DataSift\TestBundle\Log\Logger\LoggerInterface $logger, $timeout)
+    public function createWorker(LoggerInterface $logger, $timeout)
     {
         return new Worker(
                 new Thread(new ThreadManager()), 

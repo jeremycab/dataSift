@@ -21,4 +21,4 @@ $config = $configIni->fromFile('app/config/config.ini');
 
 $client = new SocketClient($config['production']['server_adress'], $config['production']['server_port']);
 $return = $client->sendData($data);
-$console->writeLine("Message received from worker manager : '$return'");
+$console->writeLine("Message received from server : '$return'");

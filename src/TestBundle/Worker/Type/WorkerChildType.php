@@ -16,7 +16,7 @@ class WorkerChildType extends WorkerAbstractType
      */
     public function isInTimeOut()
     {
-        return ((time() - $this->worker->getQueueOut()->getLastMsgSent()) > $this->worker->getTimeout());
+        return ((time() - $this->worker->getTimestampLastMsgSent()) > $this->worker->getTimeout());
     }
 
     /**
@@ -25,7 +25,8 @@ class WorkerChildType extends WorkerAbstractType
     public function processQueueMessages()
     {
         //get all the messages to process
-        $queue = $this->worker->getQueueIn()->getCurrentMsg();
+        $queue = $this->worker->getMsgsReceived();
+
         //we check for each of them if it's a message saying that we have to stop the worker
         foreach ($queue as $msg) {
             if ($msg == Worker::MSG_QUIT) {
@@ -33,11 +34,12 @@ class WorkerChildType extends WorkerAbstractType
                 return;
             }
 
+            $tasks = $this->worker->getTasks();
             //call each task with the data received
-            foreach ($this->worker->getTasks() as $task) {
-                $this->worker->getQueueOut()->sendMsg($this->worker . ' start new task');
-                $result = $task->work(array($msg));
-                $this->worker->getQueueOut()->sendMsg('Message processed by ' . $this->worker . '. Result : ' . $result);
+            foreach ($tasks as $task) {
+                $this->worker->sendMsgFrom($this->worker . ' start new task');
+                $result = $task->work($msg);
+                $this->worker->sendMsgFrom('Message processed by ' . $this->worker . '. Result : ' . $result);
             }
         }
     }
