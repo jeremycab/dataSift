@@ -24,9 +24,11 @@ The parameters required are :
  * server_port ; the port used by the manager to create connexion with clients
  * nb_clients_max = 10 ; the maximum number of connexion  
  * path_log_file : file where the logs will be written
+
 ### Usage
 #### Tasks
 The task processed by the workers encrypt in MD5 the data sent.
+
 #### Daemon
 Start to execute the file "daemon.php". This script launch the workers and is listening for clients connections.
 ```html
@@ -37,8 +39,10 @@ In order to send data to the workers, run the script "TaskCommand.php" and follo
 ```html
 php src/TestBundle/Command/TaskCommand.php
 ```
+
 #### Monitoring
 You can monitor the application by reading the log file configured in "config.ini".
+
 ### Unit tests
 Use PHPUnit to run the unit tests
 ```html
