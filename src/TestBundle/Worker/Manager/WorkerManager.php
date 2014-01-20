@@ -80,6 +80,7 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
             $worker->setIsActive();
             //add it to the collections
             $this->workersCollection->addWorker($worker);
+            $this->logger->log($worker . ' launched');
         } else { // if we are in the child process
             //set the child strategy to the process
             $worker->setIsInChildProcess();

@@ -22,7 +22,7 @@ class SocketClient
     {
         $fp = stream_socket_client("tcp://" . $this->adress . ":" . $this->port, $errno, $errstr, 30);
         if (!$fp) {
-            echo "$errstr ($errno)<br />\n";
+            throw new \RuntimeException($errstr ($errno));
         } else {
             fwrite($fp, $data);
             $data = fread($fp, 26);
