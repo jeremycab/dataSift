@@ -42,6 +42,6 @@ You can monitor the application by reading the log file configured in "config.in
 ### Unit tests
 Use PHPUnit to run the unit tests
 ```html
-phpunit -c phpunit.xml
+phpunit -c phpunit.xml 
 ```
 
