@@ -22,15 +22,15 @@ The parameters required are :
  * timeout : the time between keep-alive messages from worker
  * server_adress : the domain used by the manager to create connexion with clients
  * server_port ; the port used by the manager to create connexion with clients
- * nb_clients_max = 10 ; the maximum number of connexion  
- * path_log_file : file where the logs will be written
+ * nb_clients_max = 10 ; number of simultaneous clients 
+ * path_log_file : path to the log file
 
 ### Usage
 #### Tasks
-The task processed by the workers encrypt in MD5 the data sent.
+The task processed by the workers encrypts in MD5 the data sent.
 
 #### Daemon
-Start to execute the file "daemon.php". This script launch the workers and is listening for clients connections.
+Start to execute the file "daemon.php". This script launch the workers and listens for clients connections.
 ```html
 php daemon.php
 ```
