@@ -12,5 +12,10 @@ class DummyTask implements TaskInterface
     public function work($data)
     {
         return md5($data);
+    }
+
+    public function getName()
+    {
+        return 'dummy';
     }    
 }

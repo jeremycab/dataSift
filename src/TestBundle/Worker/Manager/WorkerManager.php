@@ -6,7 +6,7 @@ use \DataSift\TestBundle\Thread\Manager\ThreadManager;
 use \DataSift\TestBundle\Log\Logger\LoggerInterface;
 use \DataSift\TestBundle\Worker\Worker;
 use \DataSift\TestBundle\Thread\Event\Observer\ThreadEventObserverInterface;
-use \DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
+use DataSift\TestBundle\Server\Listener\ServerListenerInterface;
 use \DataSift\TestBundle\Worker\Factory\WorkerFactory;
 use DataSift\TestBundle\Worker\Collection\WorkerCollection;
 
@@ -42,6 +42,11 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
      * @var WorkerFactory
      */
     private $workerFactory;
+    
+    /**
+     * @var string
+     */
+    private $name;
 
     /**
      * init the worker manager 
@@ -61,6 +66,12 @@ class WorkerManager implements ThreadEventObserverInterface, ServerListenerInter
         $this->data = array();
         $this->logger = $logger;
         $this->workerFactory = $workerFactory;
+        $this->name = '';
+    }
+    
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**

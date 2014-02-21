@@ -38,9 +38,10 @@ class WorkerChildType extends WorkerAbstractType
             $tasks = $this->worker->getTasks();
             //call each task with the data received
             foreach ($tasks as $task) {
-                $this->logger->log($this->worker . ' start new task');
+                $this->logger->log($this->worker . ' start new task : ' . $task->getName());
                 $result = $task->work($msg);
                 $this->worker->sendMsgFrom('Message processed by ' . $this->worker . '. Result : ' . $result);
+                $this->logger->log($this->worker . ' has finished its duty');
             }
         }
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace DataSift\TestBundle\Socket\Server;
+namespace DataSift\TestBundle\Server\Socket\Server;
 
 /**
  * Class to handle a sockets server
@@ -72,6 +72,7 @@ abstract class SocketServerAbstract
 
         // start listening for connections
         socket_listen($this->master) or die($this->log('Could not set up socket listener'));
+        socket_set_nonblock($this->master);
 
         $this->log('Server started on ' . $this->address . ':' . $this->port);
     }

@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 
 use Zend\Console\Prompt\Line;
 use Zend\Console\Console;
-use \DataSift\TestBundle\Socket\Client\SocketClient;
+use \DataSift\TestBundle\Server\Socket\Client\SocketClient;
 use \Zend\Config\Reader\Ini;
 
 $console = Console::getInstance();

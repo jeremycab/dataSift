@@ -13,4 +13,10 @@ interface TaskInterface
      * @param array $params : array with all the parameters sent by the client
      */
     public function work($data);
+    
+    /**
+     * get the name of the task
+     * @return string
+     */
+    public function getName();
 }

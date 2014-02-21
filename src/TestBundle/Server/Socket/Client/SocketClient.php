@@ -1,6 +1,6 @@
 <?php
 
-namespace DataSift\TestBundle\Socket\Client;
+namespace DataSift\TestBundle\Server\Socket\Client;
 
 /**
  * Description of Client

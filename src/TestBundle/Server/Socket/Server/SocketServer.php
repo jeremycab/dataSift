@@ -1,16 +1,17 @@
 <?php
 
-namespace DataSift\TestBundle\Socket\Server;
+namespace DataSift\TestBundle\Server\Socket\Server;
 
 use \DataSift\TestBundle\Log\Logger\LoggerInterface;
-use DataSift\TestBundle\Socket\Server\Listener\ServerListenerInterface;
+use \DataSift\TestBundle\Server\Listener\ServerListenerInterface;
+use \DataSift\TestBundle\Server\ServerInterface;
 
 /**
  * Description of SocketServer
  *
  * @author jcabantous
  */
-class SocketServer extends SocketServerAbstract
+class SocketServer extends SocketServerAbstract implements ServerInterface
 {
     /**
      * @var LoggerInterface
