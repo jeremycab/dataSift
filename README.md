@@ -1,6 +1,6 @@
 #Test DataSift : Job Queue
 ## Requirements
-This is my project for the DataSift test "Job Queue".
+This is my project for the DataSift test "Job Queue"..
 ### Install dependencies
 The external dependencies used by this project are :
  * PHPUnit version 3.7
